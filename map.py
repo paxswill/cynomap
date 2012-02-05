@@ -55,7 +55,7 @@ class CynoMap(object):
 	@staticmethod
 	def calc_distance(sys1, sys2):
 		"""Calculate the distance between two sets of 3d coordinates"""
-		return sqrt((sys1['x']-sys2['x'])**2+(sys1['y']-sys2['y'])**2+(sys1['z']-sys2['z'])**2) / 10000000000000000
+		return sqrt((sys1['x']-sys2['x'])**2+(sys1['y']-sys2['y'])**2+(sys1['z']-sys2['z'])**2) / 9460000000000000.0
 
 	@property
 	def systems(self):
@@ -142,15 +142,15 @@ class CynoMap(object):
 		if not self.keyid or not self.vcode: return {}
 		if not hasattr(self, '_cynochars'):
 			auth = EVEAPIConnection(cacheHandler=DbCacheHandler()).auth(keyID=self.keyid, vCode=self.vcode)
-			chars = auth.account.Characters()
-			members = auth.corp.MemberTracking(characterID=chars.characters[0].characterID)
+			#chars = auth.account.APIKeyInfo()
+			members = auth.corp.MemberTracking(extended=1)
 			
 			self._cynochars = {}
 			for member in members.members:
 				loc = self.get_system_location(member.locationID)
 				if not loc: continue
 				
-				info = {'name': member.name }
+				info = member.name
 				if not int(loc) in self._cynochars:
 					self._cynochars[loc] = [info]
 				else:
@@ -194,12 +194,14 @@ class CynoMap(object):
 			if sys['id'] in self.get_cyno_locations():
 				fill = 'red'
 				radius = 5
+				title = "%s (%s)" % (sys['name'], ', '.join(self.get_cyno_locations()[sys['id']]))
 			else:
 				fill = 'gray'
 				for loc in self.get_cyno_locations():
 					if self.calc_distance(sys, self.systems[loc]) < self.jumprange:
 						fill = 'blue'
 				radius = 2
+				title = sys['name']
 			
 
 			
@@ -207,7 +209,7 @@ class CynoMap(object):
 			if lowz > sys['cz']: lowz = sys['cz']
 			if highx < sys['cx']: highx = sys['cx']
 			if highz < sys['cz']: highz = sys['cz']
-			attrs = {'cx': sys['cx'], 'cy': -sys['cz'], 'r': radius, 'id': 'system-%s' % sys['id'], 'class': 'system', 'fill': fill, 'stroke-width': 0}
+			attrs = {'cx': sys['cx'], 'cy': -sys['cz'], 'r': radius, 'id': 'system-%s' % sys['id'], 'class': 'system', 'fill': fill, 'stroke-width': 0, 'title': title}
 			svg = SVG('circle', **attrs)
 			sysgroup.append(svg)
 			
