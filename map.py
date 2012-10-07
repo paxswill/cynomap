@@ -15,7 +15,7 @@ __version__ = (0,0,1)
 
 class CynoMap(object):
 
-	def __init__(self, dbtype='sqlite3', conn={'database': 'cruc101-sqlite3-v1.db'}, keyid=None, vcode=None, jumprange=13):
+	def __init__(self, dbtype='sqlite3', conn={'database': 'cru11-sqlite3-v1.db'}, keyid=None, vcode=None, jumprange=13):
 	
 		if dbtype == 'sqlite3':
 			from sqlite3 import connect
@@ -192,9 +192,12 @@ class CynoMap(object):
 		sysgroup = SVG('g', id='systems')
 		for sys in self.systems.values():
 			if sys['id'] in self.get_cyno_locations():
-				fill = 'red'
+                                if sys['security'] < 0.5:
+					fill = 'red'
+				else:
+					fill = 'green'
 				radius = 5
-				title = "%s (%s)" % (sys['name'], ', '.join(self.get_cyno_locations()[sys['id']]))
+				title = "%s - %s (%s)" % (sys['name'], round(sys['security'], 2), ', '.join(self.get_cyno_locations()[sys['id']]))
 			else:
 				fill = 'gray'
 				for loc in self.get_cyno_locations():

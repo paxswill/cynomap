@@ -4,8 +4,8 @@ from map import CynoMap
 
 app = Flask(__name__)
 
-keyid = 0
-vcode = ""
+keyid = 525316
+vcode = "8jIZ4pjpQOKQsUPY4cSpIy0Rtd4AcBh6HzOOzDC4qFlI0UO7dtJUVSkh7G7NhST"
 
 @app.route('/cynos.svg')
 @app.route('/cynos-<range>.svg')
