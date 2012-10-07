@@ -1,6 +1,6 @@
 import logging
 from flask import Flask, Response
-from map import CynoMap
+from cynomap import CynoMap
 
 app = Flask(__name__)
 
