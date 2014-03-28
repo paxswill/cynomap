@@ -1,17 +1,15 @@
+import os
 import logging
 from flask import Flask, Response
 from cynomap import CynoMap
 
 app = Flask(__name__)
 
-keyid = 525316
-vcode = "8jIZ4pjpQOKQsUPY4cSpIy0Rtd4AcBh6HzOOzDC4qFlI0UO7dtJUVSkh7G7NhST"
-
 @app.route('/cynos.svg')
 @app.route('/cynos-<range>.svg')
 def cynos(range=13):
 	logging.info('Range %s' % range)
-	map = CynoMap(jumprange=float(range), keyid=keyid, vcode=vcode).svg.standalone_xml()
+	map = CynoMap(jumprange=float(range), keyid=os.environ['CYNOMAP_KEYID'], vcode=os.environ['CYNOMAP_VCODE']).svg.standalone_xml()
 	return Response(mimetype='image/svg+xml', response=map)
 
 @app.route('/')
