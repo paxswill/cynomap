@@ -15,7 +15,7 @@ __version__ = (0,0,1)
 
 class CynoMap(object):
 
-	def __init__(self, dbtype='sqlite3', conn={'database': 'cru11-sqlite3-v1.db'}, keyid=None, vcode=None, jumprange=13):
+	def __init__(self, dbtype='sqlite3', conn={'database': 'sqlite-latest.sqlite'}, keyid=None, vcode=None, jumprange=13):
 	
 		if dbtype == 'sqlite3':
 			from sqlite3 import connect
