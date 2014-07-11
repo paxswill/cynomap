@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cynomap</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <style>
+    label {
+      display: inline-block;
+      width: 5em;
+    }
+    </style>
+  </head>
+  <body>
+  {{ mapsvg|safe }}
+  <script type="text/javascript">
+  $(function() {
+      $('#systems').tooltip({
+        track: true
+      });
+  });
+  </script>
+  </body>
+</html>
