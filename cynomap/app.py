@@ -1,5 +1,6 @@
 import os
 import logging
+from binascii import hexlify
 from flask import Flask, Response, render_template, redirect, url_for, request
 from cynomap import CynoMap
 
@@ -59,17 +60,34 @@ base_range = {
     'blackops': 3.5,
 }
 
+api_store = {}
 
 @app.route('/')
 @app.route('/<float:jump_range>/')
 @app.route('/<ship_class>/')
 @app.route('/<ship_class>/<int:jdc_level>/')
 def index(jump_range=None, ship_class='carrier', jdc_level=None):
+    if 'keyid' in request.values and 'vcode' in request.values:
+        new_tuple = (request.values['keyid'], request.values['vcode'])
+        ephemeral_key = hexlify(os.urandom(4))
+        api_store[ephemeral_key] = new_tuple
+        args = request.view_args if request.view_args is not None else {}
+        return redirect(url_for('index', id=ephemeral_key, **args))
+    if 'id' in request.values:
+        try:
+            keyid, vcode = api_store[request.values['id']]
+        except KeyError:
+            keyid = vcode = None
+    if keyid is None:
+        keyid = os.environ['CYNOMAP_KEYID']
+        vcode = os.environ['CYNOMAP_VCODE']
     if jump_range is None:
         if ship_class in hull_classes:
             args = {'ship_class': hull_classes[ship_class]}
             if jdc_level is not None:
                 args['jdc_level'] = jdc_level
+            if 'id' in request.values:
+                args['id'] = request.values['id']
             return redirect(url_for('index', **args))
         jump_range = base_range.get(ship_class, 6.5)
         if jdc_level is None:
@@ -79,10 +97,6 @@ def index(jump_range=None, ship_class='carrier', jdc_level=None):
         elif jdc_level < 0:
             jdc_level = 0
         jump_range *= 1 + (0.25 * jdc_level)
-    keyid = request.values.get('keyid', os.environ.get('CYNOMAP_KEYID'))
-    vcode = request.values.get('vcode', os.environ.get('CYNOMAP_VCODE'))
-    if keyid is None or vcode is None:
-        abort(400)
     svg = CynoMap(jumprange=jump_range, keyid=keyid, vcode=vcode).svg.xml()
     return render_template('index.html', mapsvg=svg)
 
