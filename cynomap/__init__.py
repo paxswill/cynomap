@@ -198,13 +198,14 @@ class CynoMap(object):
 					fill = 'green'
 				radius = 5
 				title = "%s - %s (%s)" % (sys['name'], round(sys['security'], 2), ', '.join(self.get_cyno_locations()[sys['id']]))
+                                title = str(title)
 			else:
 				fill = 'gray'
 				for loc in self.get_cyno_locations():
 					if self.calc_distance(sys, self.systems[loc]) < self.jumprange:
 						fill = 'blue'
 				radius = 2
-				title = sys['name']
+				title = str(sys['name'])
 			
 
 			
