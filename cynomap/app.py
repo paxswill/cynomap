@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, Response, render_template, redirect, url_for
+from flask import Flask, Response, render_template, redirect, url_for, request
 from cynomap import CynoMap
 
 app = Flask(__name__)
@@ -79,9 +79,11 @@ def index(jump_range=None, ship_class='carrier', jdc_level=None):
         elif jdc_level < 0:
             jdc_level = 0
         jump_range *= 1 + (0.25 * jdc_level)
-    svg = CynoMap(jumprange=jump_range,
-            keyid=os.environ['CYNOMAP_KEYID'],
-            vcode=os.environ['CYNOMAP_VCODE']).svg.xml()
+    keyid = request.values.get('keyid', os.environ.get('CYNOMAP_KEYID'))
+    vcode = request.values.get('vcode', os.environ.get('CYNOMAP_VCODE'))
+    if keyid is None or vcode is None:
+        abort(400)
+    svg = CynoMap(jumprange=jump_range, keyid=keyid, vcode=vcode).svg.xml()
     return render_template('index.html', mapsvg=svg)
 
 if __name__ == '__main__':
