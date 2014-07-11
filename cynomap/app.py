@@ -73,11 +73,12 @@ def index(jump_range=None, ship_class='carrier', jdc_level=None):
         api_store[ephemeral_key] = new_tuple
         args = request.view_args if request.view_args is not None else {}
         return redirect(url_for('index', id=ephemeral_key, **args))
+    keyid = vcode = None
     if 'id' in request.values:
         try:
             keyid, vcode = api_store[request.values['id']]
         except KeyError:
-            keyid = vcode = None
+            pass
     if keyid is None:
         keyid = os.environ['CYNOMAP_KEYID']
         vcode = os.environ['CYNOMAP_VCODE']
