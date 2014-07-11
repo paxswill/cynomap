@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, Response, render_template
+from flask import Flask, Response, render_template, redirect, url_for
 from cynomap import CynoMap
 
 app = Flask(__name__)
@@ -11,6 +11,35 @@ def cynos(range=13):
     logging.info('Range %s' % range)
     map = CynoMap(jumprange=float(range), keyid=os.environ['CYNOMAP_KEYID'], vcode=os.environ['CYNOMAP_VCODE']).svg.standalone_xml()
     return Response(mimetype='image/svg+xml', response=map)
+
+
+hull_classes = {
+    'chimera': 'carrier',
+    'archon': 'carrier',
+    'nidhoggur': 'carrier',
+    'thanatos': 'carrier',
+    'wyvern': 'supercarrier',
+    'aeon': 'supercarrier',
+    'hel': 'supercarrier',
+    'nyx': 'supercarrier',
+    'revenant': 'supercarrier',
+    'phoenix': 'dread',
+    'revelation': 'dread',
+    'naglfar': 'dread',
+    'moros': 'dread',
+    'widow': 'blops',
+    'redeemer': 'blops',
+    'panther': 'blops',
+    'sin': 'blops',
+    'charon': 'jumpfreighter',
+    'ark': 'jumpfreighter',
+    'nomad': 'jumpfreighter',
+    'anshar': 'jumpfreighter',
+    'leviathan': 'titan',
+    'avatar': 'titan',
+    'ragnarok': 'titan',
+    'erebus': 'titan',
+}
 
 
 base_range = {
@@ -35,10 +64,17 @@ base_range = {
 @app.route('/<float:jump_range>/')
 @app.route('/<ship_class>/')
 @app.route('/<ship_class>/<int:jdc_level>/')
-def index(jump_range=None, ship_class='carrier', jdc_level=4):
+def index(jump_range=None, ship_class='carrier', jdc_level=None):
     if jump_range is None:
+        if ship_class in hull_classes:
+            args = {'ship_class': hull_classes[ship_class]}
+            if jdc_level is not None:
+                args['jdc_level'] = jdc_level
+            return redirect(url_for('index', **args))
         jump_range = base_range.get(ship_class, 6.5)
-        if jdc_level > 5:
+        if jdc_level is None:
+            jdc_level = 4
+        elif jdc_level > 5:
             jdc_level = 5
         elif jdc_level < 0:
             jdc_level = 0
